@@ -7,14 +7,14 @@ import com.mall.auth.domain.po.LoginRecord;
  * @version : [v1.0]
  * @createTime : [2024/3/29 20:47]
  */
-public interface ILoginRecordService {
+public interface LoginRecordService {
     /**
      * 保存登录成功记录
      *
-     * @param cellPhone 电话
+     * @param mail 邮箱
      * @param userId 用户id
      */
-    void saveLoginSuccessRecord(String cellPhone, Long userId);
+    void saveLoginSuccessRecord(String mail, Long userId);
 
     /**
      * 异步保存登录成功记录

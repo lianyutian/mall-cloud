@@ -4,12 +4,12 @@ package com.mall.auth.service.impl;
 import com.mall.api.client.user.UserClient;
 import com.mall.api.dto.user.LoginFormDTO;
 import com.mall.auth.common.constants.JwtConstants;
-import com.mall.auth.service.IAccountService;
-import com.mall.auth.service.ILoginRecordService;
+import com.mall.auth.service.AccountService;
+import com.mall.auth.service.LoginRecordService;
 import com.mall.auth.utils.JwtTool;
 
 import com.mall.common.domain.dto.LoginUserDTO;
-import com.mall.common.exceptions.BadRequestException;
+import com.mall.common.exceptions.MallException;
 import com.mall.common.utils.BooleanUtils;
 import com.mall.common.utils.WebUtils;
 import lombok.AllArgsConstructor;
@@ -22,18 +22,18 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @AllArgsConstructor
-public class AccountServiceImpl implements IAccountService {
+public class AccountServiceImpl implements AccountService {
 
     private final UserClient userClient;
     private final JwtTool jwtTool;
-    private final ILoginRecordService loginRecordService;
+    private final LoginRecordService loginRecordService;
 
     @Override
     public String loginByPw(LoginFormDTO loginFormDTO, boolean isStaff) {
         // 1.查询并校验用户信息
-        LoginUserDTO loginUserDTO = userClient.queryLoginUser(loginFormDTO, isStaff);
+        LoginUserDTO loginUserDTO = userClient.queryLoginUser(loginFormDTO);
         if (loginUserDTO == null) {
-            throw new BadRequestException("登录信息有误");
+            throw new MallException("用户名或密码错误!");
         }
         // 2.基于JWT生成登录token
         // 2.1.设置记住我标记
@@ -41,7 +41,7 @@ public class AccountServiceImpl implements IAccountService {
         // 2.2.生成token
         String token = generateToken(loginUserDTO);
         // 3.计入登录信息表
-        loginRecordService.saveLoginSuccessRecord(loginFormDTO.getCellPhone(), loginUserDTO.getUserId());
+        // loginRecordService.saveLoginSuccessRecord(loginFormDTO.getMail(), loginUserDTO.getUserId());
         // 4.返回结果
         return token;
     }
@@ -76,7 +76,7 @@ public class AccountServiceImpl implements IAccountService {
         int maxAge = BooleanUtils.isTrue(detail.getRememberMe()) ?
                 (int) JwtConstants.JWT_REMEMBER_ME_TTL.toSeconds() : -1;
         WebUtils.cookieBuilder()
-                .name(detail.getRoleId() == 2 ? JwtConstants.REFRESH_HEADER : JwtConstants.ADMIN_REFRESH_HEADER)
+                .name(JwtConstants.REFRESH_HEADER)
                 .value(refreshToken)
                 .maxAge(maxAge)
                 .httpOnly(true)

@@ -34,11 +34,7 @@ public class UserDTO {
     private String headImg;
 
     @Schema(description = "性别：0-男性，1-女性", name = "sex", example = "0")
-    @NotEmpty
     private Integer sex;
-
-    @Schema(description = "积分", name = "points", example = "100")
-    private Integer points;
 
     @Schema(description = "邮箱", name = "mail")
     @Email

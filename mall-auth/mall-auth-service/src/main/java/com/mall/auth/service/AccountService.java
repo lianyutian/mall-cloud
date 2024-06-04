@@ -7,7 +7,7 @@ import com.mall.api.dto.user.LoginFormDTO;
  * @version 1.0
  * @since 2024/3/28 14:14
  */
-public interface IAccountService {
+public interface AccountService {
 
     /**
      * 根据账号名密码登录

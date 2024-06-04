@@ -18,14 +18,13 @@ import java.util.List;
 @FeignClient(value = "user-service", fallbackFactory = UserClientFallback.class)
 public interface UserClient {
     /**
-     * 登录接口
+     * 查询登录用户信息
      *
      * @param loginDTO 登录信息
-     * @param isStaff 是否是员工
      * @return 用户详情
      */
-    @PostMapping("/user/queryLoginUser/{isStaff}")
-    LoginUserDTO queryLoginUser(@RequestBody LoginFormDTO loginDTO, @PathVariable("isStaff") boolean isStaff);
+    @PostMapping("/user/queryLoginUser")
+    LoginUserDTO queryLoginUser(@RequestBody LoginFormDTO loginDTO);
 
     /**
      * 根据id批量查询用户信息

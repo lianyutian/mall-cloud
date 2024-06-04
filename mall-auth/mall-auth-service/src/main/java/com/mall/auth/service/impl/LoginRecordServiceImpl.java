@@ -2,11 +2,12 @@ package com.mall.auth.service.impl;
 
 import com.mall.auth.domain.po.LoginRecord;
 import com.mall.auth.mapper.LoginRecordMapper;
-import com.mall.auth.service.ILoginRecordService;
+import com.mall.auth.service.LoginRecordService;
 import com.mall.common.exceptions.DbException;
 import com.mall.common.utils.MarkedRunnable;
 import com.mall.common.utils.WebUtils;
 import lombok.AllArgsConstructor;
+import org.springframework.aop.framework.AopContext;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +23,7 @@ import java.util.concurrent.ThreadPoolExecutor;
  */
 @Service
 @AllArgsConstructor
-public class LoginRecordServiceImpl implements ILoginRecordService {
+public class LoginRecordServiceImpl implements LoginRecordService {
 
     private static final Executor WRITE_RECORD_EXECUTOR;
 
@@ -52,9 +53,9 @@ public class LoginRecordServiceImpl implements ILoginRecordService {
         record.setLoginTime(now);
         record.setLoginDate(now.toLocalDate());
         record.setUserId(userId);
-        record.setCellPhone(cellPhone);
         record.setIpv4(WebUtils.getRemoteAddr());
-        saveAsync(record);
+
+        ((LoginRecordServiceImpl) AopContext.currentProxy()).saveAsync(record);
     }
 
     @Override

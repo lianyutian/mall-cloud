@@ -22,7 +22,7 @@ public class UserClientFallback implements FallbackFactory<UserClient> {
         log.error("查询用户服务出现异常", cause);
         return new UserClient() {
             @Override
-            public LoginUserDTO queryLoginUser(LoginFormDTO loginDTO, boolean isStaff) {
+            public LoginUserDTO queryLoginUser(LoginFormDTO loginDTO) {
                 return null;
             }
 

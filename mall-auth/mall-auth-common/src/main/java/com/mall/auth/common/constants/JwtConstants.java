@@ -21,14 +21,6 @@ public class JwtConstants {
     public static final String JWT_ALGORITHM = "rs256";
     public static final String AUTHORIZATION_HEADER = "authorization";
     public static final String REFRESH_HEADER = "refresh";
-    public static final String ADMIN_REFRESH_HEADER = "admin-refresh";
 
     public static final String USER_HEADER = "user-info";
-
-    /**
-     * 权限缓存 KEY
-     */
-    public static final String AUTH_PRIVILEGE_KEY = "auth:privileges";
-    public static final String AUTH_PRIVILEGE_VERSION_KEY = "version";
-    public static final String LOCK_AUTH_PRIVILEGE_KEY = "lock:auth:privileges";
 }

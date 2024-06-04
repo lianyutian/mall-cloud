@@ -1,5 +1,6 @@
 package com.mall.auth.domain.po;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
+@TableName("login_record")
 public class LoginRecord {
     /**
      * 主键
@@ -25,11 +27,6 @@ public class LoginRecord {
      * 用户id
      */
     private Long userId;
-
-    /**
-     * 用户id
-     */
-    private String cellPhone;
 
     /**
      * 登录时间

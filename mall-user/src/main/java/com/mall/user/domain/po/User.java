@@ -1,5 +1,8 @@
 package com.mall.user.domain.po;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.mall.common.domain.dto.BaseDTO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,10 +17,12 @@ import java.io.Serializable;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString
+@TableName("user")
 public class User extends BaseDTO implements Serializable {
     /**
-     * 
+     * 主键id
      */
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
