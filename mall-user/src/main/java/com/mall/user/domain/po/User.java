@@ -3,7 +3,7 @@ package com.mall.user.domain.po;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.mall.common.domain.dto.BaseDTO;
+import com.mall.common.domain.dto.BasePO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -18,7 +18,7 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = true)
 @ToString
 @TableName("user")
-public class User extends BaseDTO implements Serializable {
+public class User extends BasePO implements Serializable {
     /**
      * 主键id
      */

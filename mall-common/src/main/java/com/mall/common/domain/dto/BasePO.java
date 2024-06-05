@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  * @since 2024/4/2 14:00
  */
 @Schema(description = "DTO基础属性", name = "BaseDTO")
-public class BaseDTO {
+public class BasePO {
     @Schema(description = "创建人id", name = "creater")
     public Long creater;
     @Schema(description = "更新人id", name = "updater")

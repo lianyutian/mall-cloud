@@ -13,6 +13,8 @@
         <module>mall-auth</module>
         <module>mall-api</module>
         <module>mall-common</module>
+        <module>mall-marketing</module>
+        <module>mall-marketing/mall-coupon</module>
     </modules>
 
     <!-- 继承 Spring Boot 父工程 -->
