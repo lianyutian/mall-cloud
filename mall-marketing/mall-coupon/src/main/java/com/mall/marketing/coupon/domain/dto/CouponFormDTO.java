@@ -2,7 +2,7 @@ package com.mall.marketing.coupon.domain.dto;
 
 import com.mall.common.validate.annotations.EnumValid;
 import com.mall.marketing.coupon.enums.DiscountType;
-import com.mall.marketing.coupon.enums.ObtainType;
+import com.mall.marketing.coupon.enums.ObtainWay;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -58,5 +58,5 @@ public class CouponFormDTO {
     @Schema(description = "获取方式1：手动领取，2：指定发放（通过兑换码兑换）", name = "obtainType")
     @NotNull(message = "领取方式不能为空")
     @EnumValid(enumeration = {1, 2}, message = "领取方式不正确")
-    private ObtainType obtainType;
+    private ObtainWay obtainType;
 }

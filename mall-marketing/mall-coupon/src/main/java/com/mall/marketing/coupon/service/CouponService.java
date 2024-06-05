@@ -2,7 +2,9 @@ package com.mall.marketing.coupon.service;
 
 import com.mall.common.domain.dto.PageDTO;
 import com.mall.marketing.coupon.domain.dto.CouponFormDTO;
+import com.mall.marketing.coupon.domain.dto.CouponIssueFormDTO;
 import com.mall.marketing.coupon.domain.query.CouponQuery;
+import com.mall.marketing.coupon.domain.vo.CouponDetailVO;
 import com.mall.marketing.coupon.domain.vo.CouponPageVO;
 
 /**
@@ -26,4 +28,33 @@ public interface CouponService {
      * @return 优惠券分页数据
      */
     PageDTO<CouponPageVO> queryCouponsByPage(CouponQuery query);
+
+    /**
+     * 发放优惠券
+     *
+     * @param couponIssueFormDTO 优惠券发放表单实体
+     */
+    void issueCoupon(CouponIssueFormDTO couponIssueFormDTO);
+
+    /**
+     * 更新优惠券
+     *
+     * @param couponFormDTO 优惠券表单实体
+     */
+    void updateCoupon(CouponFormDTO couponFormDTO);
+
+    /**
+     * 删除优惠券
+     *
+     * @param id 优惠券id
+     */
+    void deleteCoupon(Long id);
+
+    /**
+     * 优惠券详情
+     *
+     * @param id 优惠券id
+     * @return 优惠券详情
+     */
+    CouponDetailVO queryCouponDetailById(Long id);
 }

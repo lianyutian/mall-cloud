@@ -1,5 +1,6 @@
 package com.mall.marketing.coupon.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.mall.common.enums.BaseEnum;
@@ -13,7 +14,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public enum ObtainType implements BaseEnum {
+public enum ObtainWay implements BaseEnum {
     /**
      * 领取类型
      */
@@ -21,15 +22,16 @@ public enum ObtainType implements BaseEnum {
     ISSUE(2, "发放兑换码");
 
     @JsonValue
+    @EnumValue
     private final int value;
     private final String desc;
 
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
-    public static ObtainType of(Integer value) {
+    public static ObtainWay of(Integer value) {
         if (value == null) {
             return null;
         }
-        for (ObtainType status : values()) {
+        for (ObtainWay status : values()) {
             if (status.value == value) {
                 return status;
             }

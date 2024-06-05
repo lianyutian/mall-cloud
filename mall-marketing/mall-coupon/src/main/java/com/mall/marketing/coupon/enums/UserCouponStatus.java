@@ -1,5 +1,6 @@
 package com.mall.marketing.coupon.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.mall.common.enums.BaseEnum;
@@ -23,6 +24,7 @@ public enum UserCouponStatus implements BaseEnum {
     ;
 
     @JsonValue
+    @EnumValue
     private final int value;
     private final String desc;
 

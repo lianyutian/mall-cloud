@@ -1,19 +1,17 @@
 package com.mall.marketing.coupon.controller;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mall.common.domain.dto.PageDTO;
 import com.mall.marketing.coupon.domain.dto.CouponFormDTO;
+import com.mall.marketing.coupon.domain.dto.CouponIssueFormDTO;
 import com.mall.marketing.coupon.domain.query.CouponQuery;
+import com.mall.marketing.coupon.domain.vo.CouponDetailVO;
 import com.mall.marketing.coupon.domain.vo.CouponPageVO;
 import com.mall.marketing.coupon.service.CouponService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * CouponController
@@ -38,7 +36,31 @@ public class CouponController {
 
     @Operation(summary = "优惠券分页查询")
     @PostMapping("queryCouponsByPage")
-    public PageDTO<CouponPageVO> queryCouponsByPage(CouponQuery query) {
+    public PageDTO<CouponPageVO> queryCouponsByPage(@RequestBody CouponQuery query) {
         return couponService.queryCouponsByPage(query);
+    }
+
+    @Operation(summary = "发放优惠券")
+    @PostMapping("issueCoupon")
+    public void issueCoupon(@Valid @RequestBody CouponIssueFormDTO couponIssueFormDTO) {
+        couponService.issueCoupon(couponIssueFormDTO);
+    }
+
+    @Operation(summary = "更新优惠券")
+    @PostMapping("updateCoupon")
+    public void updateCoupon(@Valid @RequestBody CouponFormDTO couponFormDTO) {
+        couponService.updateCoupon(couponFormDTO);
+    }
+
+    @Operation(summary = "删除优惠券")
+    @PostMapping("deleteCoupon")
+    public void deleteCoupon(Long id) {
+        couponService.deleteCoupon(id);
+    }
+
+    @Operation(summary = "优惠券详情")
+    @GetMapping("queryCouponDetailById/{id}")
+    public CouponDetailVO queryCouponDetailById(@PathVariable Long id) {
+        return couponService.queryCouponDetailById(id);
     }
 }

@@ -1,16 +1,19 @@
 package com.mall.marketing.coupon.domain.po;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import com.mall.common.domain.dto.BasePO;
+import com.mall.common.utils.DateUtils;
+import com.mall.marketing.coupon.enums.CouponStatus;
+import com.mall.marketing.coupon.enums.DiscountType;
+import com.mall.marketing.coupon.enums.ObtainWay;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  * 优惠券表信息
@@ -39,11 +42,12 @@ public class Coupon extends BasePO implements Serializable {
     /**
      * 折扣类型，1：满减，2：每满减，3：折扣，4：无门槛
      */
-    private Integer discountType;
+    private DiscountType discountType;
 
     /**
      * 是否限定作用范围，false：不限定，true：限定。默认false
      */
+    @TableField(value = "`specific`")
     private Boolean specific;
 
     /**
@@ -64,17 +68,19 @@ public class Coupon extends BasePO implements Serializable {
     /**
      * 获取方式：1：手动领取，2：兑换码
      */
-    private Integer obtainWay;
+    private ObtainWay obtainWay;
 
     /**
      * 开始发放时间
      */
-    private Date issueBeginTime;
+    @DateTimeFormat(pattern = DateUtils.DEFAULT_DATE_TIME_FORMAT)
+    private LocalDateTime issueBeginTime;
 
     /**
      * 结束发放时间
      */
-    private Date issueEndTime;
+    @DateTimeFormat(pattern = DateUtils.DEFAULT_DATE_TIME_FORMAT)
+    private LocalDateTime issueEndTime;
 
     /**
      * 优惠券有效期天数，0：表示有效期是指定有效期的
@@ -84,17 +90,19 @@ public class Coupon extends BasePO implements Serializable {
     /**
      * 优惠券有效期开始时间
      */
-    private Date termBeginTime;
+    @DateTimeFormat(pattern = DateUtils.DEFAULT_DATE_TIME_FORMAT)
+    private LocalDateTime termBeginTime;
 
     /**
      * 优惠券有效期结束时间
      */
-    private Date termEndTime;
+    @DateTimeFormat(pattern = DateUtils.DEFAULT_DATE_TIME_FORMAT)
+    private LocalDateTime termEndTime;
 
     /**
      * 优惠券配置状态，1：待发放，2：未开始   3：进行中，4：已结束，5：暂停
      */
-    private Integer status;
+    private CouponStatus status;
 
     /**
      * 总数量，不超过5000

@@ -1,5 +1,6 @@
 package com.mall.marketing.coupon.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.mall.common.enums.BaseEnum;
@@ -22,6 +23,7 @@ public enum ExchangeCodeStatus implements BaseEnum {
     EXPIRED(3, "兑换活动已结束");
 
     @JsonValue
+    @EnumValue
     private final int value;
     private final String desc;
 

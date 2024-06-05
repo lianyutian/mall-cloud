@@ -3,19 +3,25 @@ package com.mall.marketing.coupon.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mall.common.domain.dto.PageDTO;
+import com.mall.common.exceptions.BadRequestException;
+import com.mall.common.exceptions.MallException;
 import com.mall.common.utils.BeanUtils;
 import com.mall.common.utils.CollUtils;
 import com.mall.common.utils.StringUtils;
 import com.mall.marketing.coupon.domain.dto.CouponFormDTO;
+import com.mall.marketing.coupon.domain.dto.CouponIssueFormDTO;
 import com.mall.marketing.coupon.domain.po.Coupon;
 import com.mall.marketing.coupon.domain.query.CouponQuery;
+import com.mall.marketing.coupon.domain.vo.CouponDetailVO;
 import com.mall.marketing.coupon.domain.vo.CouponPageVO;
+import com.mall.marketing.coupon.enums.CouponStatus;
 import com.mall.marketing.coupon.mapper.CouponMapper;
 import com.mall.marketing.coupon.service.CouponService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -57,6 +63,68 @@ public class CouponServiceImpl implements CouponService {
 
         List<CouponPageVO> couponPageVOList = BeanUtils.copyList(couponList, CouponPageVO.class);
         return PageDTO.of(couponPage, couponPageVOList);
+    }
+
+    @Override
+    @Transactional
+    public void issueCoupon(CouponIssueFormDTO couponIssueFormDTO) {
+        Coupon coupon = couponMapper.selectById(couponIssueFormDTO.getId());
+        if (coupon == null) {
+            throw new BadRequestException("优惠券不存在!");
+        }
+
+        if (coupon.getStatus() != CouponStatus.DRAFT && coupon.getStatus() != CouponStatus.PAUSE) {
+            throw new BadRequestException("优惠券状态异常!");
+        }
+
+        // 是否立即发放
+        LocalDateTime issueBeginTime = couponIssueFormDTO.getIssueBeginTime();
+        boolean isBegin = issueBeginTime == null || !issueBeginTime.isBefore(LocalDateTime.now());
+        Coupon copyBean = BeanUtils.copyBean(couponIssueFormDTO, Coupon.class);
+        if (isBegin) {
+            // 设置优惠券为发放中，领取优惠券时根据该状态就可以查询到该优惠券
+            copyBean.setStatus(CouponStatus.ISSUING);
+            copyBean.setIssueBeginTime(LocalDateTime.now());
+        } else {
+            // 已指定优惠券开始定时发放，还未开始
+            copyBean.setStatus(CouponStatus.UN_ISSUE);
+        }
+
+        couponMapper.updateById(copyBean);
+    }
+
+    @Override
+    @Transactional
+    public void updateCoupon(CouponFormDTO couponFormDTO) {
+        Coupon coupon = couponMapper.selectById(couponFormDTO.getId());
+        if (coupon == null) {
+            throw new BadRequestException("优惠券不存在!");
+        }
+        if (coupon.getStatus() != CouponStatus.DRAFT) {
+            throw new BadRequestException("优惠券状态异常!");
+        }
+        couponMapper.updateById(BeanUtils.copyBean(couponFormDTO, Coupon.class));
+    }
+
+    @Override
+    public void deleteCoupon(Long id) {
+        Coupon coupon = couponMapper.selectById(id);
+        if (coupon == null) {
+            throw new BadRequestException("优惠券不存在!");
+        }
+        if (coupon.getStatus() != CouponStatus.DRAFT) {
+            throw new BadRequestException("优惠券状态异常!");
+        }
+        couponMapper.deleteById(id);
+    }
+
+    @Override
+    public CouponDetailVO queryCouponDetailById(Long id) {
+        Coupon coupon = couponMapper.selectById(id);
+        if (coupon == null) {
+            throw new BadRequestException("优惠券不存在!");
+        }
+        return BeanUtils.copyBean(coupon, CouponDetailVO.class);
     }
 }
 
