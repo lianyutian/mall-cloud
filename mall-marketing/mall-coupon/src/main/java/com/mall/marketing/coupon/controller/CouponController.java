@@ -6,12 +6,15 @@ import com.mall.marketing.coupon.domain.dto.CouponIssueFormDTO;
 import com.mall.marketing.coupon.domain.query.CouponQuery;
 import com.mall.marketing.coupon.domain.vo.CouponDetailVO;
 import com.mall.marketing.coupon.domain.vo.CouponPageVO;
+import com.mall.marketing.coupon.domain.vo.CouponVO;
 import com.mall.marketing.coupon.service.CouponService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * CouponController
@@ -62,5 +65,17 @@ public class CouponController {
     @GetMapping("queryCouponDetailById/{id}")
     public CouponDetailVO queryCouponDetailById(@PathVariable Long id) {
         return couponService.queryCouponDetailById(id);
+    }
+
+    @Operation(summary = "暂停优惠券发放")
+    @PostMapping("pauseCouponIssue/{id}")
+    public void pauseCouponIssue(@PathVariable Long id) {
+        couponService.pauseCouponIssue(id);
+    }
+
+    @Operation(summary = "查询发放中的优惠券列表")
+    @GetMapping("queryIssuingCoupons")
+    public List<CouponVO> queryIssuingCoupons() {
+        return couponService.queryIssuingCoupons();
     }
 }

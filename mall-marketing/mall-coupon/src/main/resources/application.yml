@@ -22,6 +22,8 @@ mall:
   auth:
     resource:
       enable: true
+      excludeLoginPaths:
+        - /coupon/queryIssuingCoupons
 
 
 

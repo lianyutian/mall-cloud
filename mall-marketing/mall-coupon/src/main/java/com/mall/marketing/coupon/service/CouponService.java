@@ -3,9 +3,13 @@ package com.mall.marketing.coupon.service;
 import com.mall.common.domain.dto.PageDTO;
 import com.mall.marketing.coupon.domain.dto.CouponFormDTO;
 import com.mall.marketing.coupon.domain.dto.CouponIssueFormDTO;
+import com.mall.marketing.coupon.domain.po.Coupon;
 import com.mall.marketing.coupon.domain.query.CouponQuery;
 import com.mall.marketing.coupon.domain.vo.CouponDetailVO;
 import com.mall.marketing.coupon.domain.vo.CouponPageVO;
+import com.mall.marketing.coupon.domain.vo.CouponVO;
+
+import java.util.List;
 
 /**
 * @author lm
@@ -57,4 +61,32 @@ public interface CouponService {
      * @return 优惠券详情
      */
     CouponDetailVO queryCouponDetailById(Long id);
+
+    /**
+     * 批量发放优惠券
+     *
+     * @param records 优惠券列表
+     */
+    void issueCouponsBatch(List<Coupon> records);
+
+    /**
+     * 暂停发放优惠券
+     *
+     * @param id 优惠券id
+     */
+    void pauseCouponIssue(Long id);
+
+    /**
+     * 停止发放优惠券
+     *
+     * @param records 优惠券列表
+     */
+    void stopIssueCoupons(List<Coupon> records);
+
+    /**
+     * 查询发放中的优惠券列表
+     *
+     * @return 优惠券列表
+     */
+    List<CouponVO> queryIssuingCoupons();
 }
