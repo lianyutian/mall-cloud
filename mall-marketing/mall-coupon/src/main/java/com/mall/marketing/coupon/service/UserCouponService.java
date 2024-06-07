@@ -1,8 +1,8 @@
 package com.mall.marketing.coupon.service;
 
+import com.mall.common.domain.dto.PageDTO;
+import com.mall.marketing.coupon.domain.query.UserCouponQuery;
 import com.mall.marketing.coupon.domain.vo.CouponVO;
-
-import java.util.List;
 
 /**
 * @author lm
@@ -10,4 +10,18 @@ import java.util.List;
 * @createDate 2024-06-06 15:54:53
 */
 public interface UserCouponService {
+
+    /**
+     * 领取优惠券
+     *
+     * @param id 优惠券id
+     */
+    void receiveCoupon(Long id, Long userId);
+
+    /**
+     * 查询用户优惠券
+     *
+     * @return 用户优惠券
+     */
+    PageDTO<CouponVO> queryUserCoupons(UserCouponQuery userCouponQuery);
 }

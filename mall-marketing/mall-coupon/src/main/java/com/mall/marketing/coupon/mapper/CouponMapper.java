@@ -2,6 +2,7 @@ package com.mall.marketing.coupon.mapper;
 
 import com.mall.marketing.coupon.domain.po.Coupon;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Update;
 
 /**
 * @author lm
@@ -11,6 +12,13 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 */
 public interface CouponMapper extends BaseMapper<Coupon> {
 
+    /**
+     * 优惠券已发数量+1
+     *
+     * @param id 优惠券id
+     */
+    @Update("UPDATE coupon SET issue_num = issue_num + 1 WHERE id = #{id} and issue_num < total_num")
+    boolean incrIssueNum(Long id);
 }
 
 
