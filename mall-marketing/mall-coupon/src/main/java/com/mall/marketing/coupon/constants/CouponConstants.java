@@ -10,4 +10,5 @@ package com.mall.marketing.coupon.constants;
 public interface CouponConstants {
 
     String COUPON_CACHE_KEY_PREFIX = "marketing:coupon:";
+    String USER_COUPON_CACHE_KEY_PREFIX = "marketing:coupon:user:";
 }

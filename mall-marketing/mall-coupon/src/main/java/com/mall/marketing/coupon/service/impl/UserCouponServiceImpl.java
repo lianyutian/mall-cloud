@@ -71,6 +71,14 @@ public class UserCouponServiceImpl implements UserCouponService {
             throw new BadRequestException("优惠券已发完!");
         }
 
+        // 查询用户领取数量
+        String key = CouponConstants.USER_COUPON_CACHE_KEY_PREFIX + id;
+        Long count = redisTemplate.opsForHash().increment(key, userId.toString(), 1);
+        // 校验限领数量
+        if(count > coupon.getUserLimit()){
+            throw new BadRequestException("超出领取数量");
+        }
+
         // 5.扣减优惠券库存
         // 如果刚扣减完库存宕机了，此时库存会多余
         redisTemplate.opsForHash().increment(
