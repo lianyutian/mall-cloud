@@ -1,6 +1,8 @@
 package com.mall.marketing.coupon.service;
 
 import com.mall.common.domain.dto.PageDTO;
+import com.mall.marketing.coupon.domain.message.UserCouponMessage;
+import com.mall.marketing.coupon.domain.po.Coupon;
 import com.mall.marketing.coupon.domain.query.UserCouponQuery;
 import com.mall.marketing.coupon.domain.vo.CouponVO;
 
@@ -24,4 +26,11 @@ public interface UserCouponService {
      * @return 用户优惠券
      */
     PageDTO<CouponVO> queryUserCoupons(UserCouponQuery userCouponQuery);
+
+    /**
+     * 创建用户优惠券
+     *
+     * @param userCouponMessage      用户优惠券消息
+     */
+    void checkAndCreateUserCoupon(UserCouponMessage userCouponMessage);
 }

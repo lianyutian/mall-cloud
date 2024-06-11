@@ -1,12 +1,18 @@
 package com.mall.marketing.coupon.service.impl;
 
+import cn.hutool.core.bean.copier.CopyOptions;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.mall.common.autoconfigure.mq.RocketMQEnhanceTemplate;
+import com.mall.common.autoconfigure.redisson.annotations.Lock;
 import com.mall.common.domain.dto.PageDTO;
 import com.mall.common.exceptions.BadRequestException;
+import com.mall.common.exceptions.BizIllegalException;
 import com.mall.common.utils.BeanUtils;
 import com.mall.common.utils.CollUtils;
 import com.mall.common.utils.UserContext;
+import com.mall.marketing.coupon.constants.CouponConstants;
+import com.mall.marketing.coupon.domain.message.UserCouponMessage;
 import com.mall.marketing.coupon.domain.po.Coupon;
 import com.mall.marketing.coupon.domain.po.UserCoupon;
 import com.mall.marketing.coupon.domain.query.UserCouponQuery;
@@ -18,11 +24,14 @@ import com.mall.marketing.coupon.mapper.CouponMapper;
 import com.mall.marketing.coupon.mapper.UserCouponMapper;
 import com.mall.marketing.coupon.service.UserCouponService;
 import lombok.AllArgsConstructor;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -32,16 +41,19 @@ import java.util.Objects;
  */
 @Service
 @AllArgsConstructor
+@EnableAspectJAutoProxy(exposeProxy = true)
 public class UserCouponServiceImpl implements UserCouponService {
 
     private final CouponMapper couponMapper;
     private final UserCouponMapper userCouponMapper;
+    private final RocketMQEnhanceTemplate rocketMQEnhanceTemplate;
+    private final StringRedisTemplate redisTemplate;
 
     @Override
-    @Transactional
+    @Lock(name = "lock:coupon:#{id}")
     public void receiveCoupon(Long id, Long userId) {
+        Coupon coupon = queryCouponByCache(id);
 
-        Coupon coupon = couponMapper.selectById(id);
         if (coupon == null) {
             throw new BadRequestException("优惠券不存在!");
         }
@@ -59,28 +71,49 @@ public class UserCouponServiceImpl implements UserCouponService {
             throw new BadRequestException("优惠券已发完!");
         }
 
-        synchronized (userId.toString().intern()) {
-            LambdaQueryWrapper<UserCoupon> queryWrapper = new LambdaQueryWrapper<>();
-            queryWrapper.eq(UserCoupon::getCouponId, id)
-                    .eq(UserCoupon::getUserId, userId);
-            List<UserCoupon> userCoupons = userCouponMapper.selectList(queryWrapper);
-            if (userCoupons != null && userCoupons.size() >= coupon.getUserLimit()) {
-                throw new BadRequestException("已领取优惠券!");
-            }
+        // 5.扣减优惠券库存
+        // 如果刚扣减完库存宕机了，此时库存会多余
+        redisTemplate.opsForHash().increment(
+                CouponConstants.COUPON_CACHE_KEY_PREFIX + id, "totalNum", -1);
 
-            boolean issueSuccess = couponMapper.incrIssueNum(coupon.getId());
+        // 发送MQ消息
+        UserCouponMessage userCouponMessage = new UserCouponMessage();
+        rocketMQEnhanceTemplate.send("MarketingCoupons", userCouponMessage);
+    }
 
-            if (issueSuccess) {
-                UserCoupon userCoupon = new UserCoupon();
-                userCoupon.setCouponId(coupon.getId());
-                //userCoupon.setUserId(UserContext.getUserId());
-                userCoupon.setUserId(userId);
-                userCoupon.setStatus(UserCouponStatus.UNUSED);
-                userCoupon.setTermBeginTime(coupon.getTermBeginTime());
-                userCoupon.setTermEndTime(coupon.getTermEndTime());
-                userCouponMapper.insert(userCoupon);
-            }
+    private Coupon queryCouponByCache(Long id) {
+        // 1.准备KEY
+        String key = CouponConstants.COUPON_CACHE_KEY_PREFIX + id;
+        // 2.查询
+        Map<Object, Object> objMap = redisTemplate.opsForHash().entries(key);
+        if (objMap.isEmpty()) {
+            return null;
         }
+        // 3.数据反序列化
+        return BeanUtils.toBean(objMap, Coupon.class, CopyOptions.create());
+    }
+
+    // 这里进事务，同时，事务方法一定要public修饰
+    @Transactional
+    @Override
+    public void checkAndCreateUserCoupon(UserCouponMessage userCouponMessage) {
+        Coupon coupon = couponMapper.selectById(userCouponMessage.getCouponId());
+        if (coupon == null) {
+            throw new BizIllegalException("优惠券不存在！");
+        }
+        int num = couponMapper.incrIssueNum(coupon.getId());
+        if (num == 0) {
+            throw new BizIllegalException("优惠券库存不足！");
+        }
+
+        // 3.新增一个用户券
+        UserCoupon userCoupon = new UserCoupon();
+        userCoupon.setCouponId(coupon.getId());
+        userCoupon.setUserId(userCouponMessage.getUserId());
+        userCoupon.setStatus(UserCouponStatus.UNUSED);
+        userCoupon.setTermBeginTime(coupon.getTermBeginTime());
+        userCoupon.setTermEndTime(coupon.getTermEndTime());
+        userCouponMapper.insert(userCoupon);
     }
 
     @Override

@@ -5,11 +5,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mall.common.domain.dto.PageDTO;
 import com.mall.common.exceptions.BadRequestException;
-import com.mall.common.exceptions.MallException;
-import com.mall.common.utils.BeanUtils;
-import com.mall.common.utils.CollUtils;
-import com.mall.common.utils.StringUtils;
-import com.mall.common.utils.UserContext;
+import com.mall.common.utils.*;
+import com.mall.marketing.coupon.constants.CouponConstants;
 import com.mall.marketing.coupon.domain.dto.CouponFormDTO;
 import com.mall.marketing.coupon.domain.dto.CouponIssueFormDTO;
 import com.mall.marketing.coupon.domain.po.Coupon;
@@ -26,11 +23,13 @@ import com.mall.marketing.coupon.mapper.UserCouponMapper;
 import com.mall.marketing.coupon.service.CouponService;
 import lombok.AllArgsConstructor;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -47,6 +46,7 @@ public class CouponServiceImpl implements CouponService {
     private final CouponMapper couponMapper;
     private final UserCouponMapper userCouponMapper;
     private final SqlSessionFactory sqlSessionFactory;
+    private final StringRedisTemplate redisTemplate;
 
     @Override
     @Transactional
@@ -103,7 +103,25 @@ public class CouponServiceImpl implements CouponService {
             copyBean.setStatus(CouponStatus.UN_ISSUE);
         }
 
+        // 设置缓存
+        if (isBegin) {
+            coupon.setIssueBeginTime(coupon.getIssueBeginTime());
+            coupon.setIssueEndTime(coupon.getIssueEndTime());
+            cacheCouponInfo(coupon);
+        }
+
         couponMapper.updateById(copyBean);
+    }
+
+    private void cacheCouponInfo(Coupon coupon) {
+        // 1.组织数据
+        Map<String, String> map = new HashMap<>(4);
+        map.put("issueBeginTime", String.valueOf(DateUtils.toEpochMilli(coupon.getIssueBeginTime())));
+        map.put("issueEndTime", String.valueOf(DateUtils.toEpochMilli(coupon.getIssueEndTime())));
+        map.put("totalNum", String.valueOf(coupon.getTotalNum()));
+        map.put("userLimit", String.valueOf(coupon.getUserLimit()));
+        // 2.写缓存
+        redisTemplate.opsForHash().putAll(CouponConstants.COUPON_CACHE_KEY_PREFIX + coupon.getId(), map);
     }
 
     @Override
@@ -179,6 +197,9 @@ public class CouponServiceImpl implements CouponService {
         }
         coupon.setStatus(CouponStatus.PAUSE);
         couponMapper.updateById(coupon);
+
+        // 删除缓存
+        redisTemplate.delete(CouponConstants.COUPON_CACHE_KEY_PREFIX + id);
     }
 
     @Override
