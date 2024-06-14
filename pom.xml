@@ -15,6 +15,7 @@
         <module>mall-common</module>
         <module>mall-marketing</module>
         <module>mall-marketing/mall-coupon</module>
+        <module>mall-product</module>
     </modules>
 
     <!-- 继承 Spring Boot 父工程 -->

@@ -1,0 +1,41 @@
+server:
+  port: 8084  #端口
+  tomcat:
+    uri-encoding: UTF-8   #服务编码
+spring:
+  profiles:
+    active: dev
+  application:
+    name: product-service
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver # 数据库驱动
+    url: jdbc:mysql://116.198.217.159:3306/mall?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai
+    username: learnhub
+    password: learnhub
+#  data:
+#    redis:
+#      host: 117.72.71.187
+#      lettuce:
+#        pool:
+#          max-active: 8 # 最大连接数，负值表示没有限制，默认8
+#          max-idle: 8   # 最大空闲连接，默认8
+#          min-idle: 1   # 最小空闲连接，默认0
+#          max-wait: 300 # 最大阻塞等待时间，负值表示没限制，默认-1
+#      username: default
+#      password: learnhub
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mapper-locations: classpath:mapper/*.xml
+
+mall:
+  auth:
+    resource:
+      enable: true
+      excludeLoginPaths:
+        - /coupon/queryIssuingCoupons
+
+
+
+
